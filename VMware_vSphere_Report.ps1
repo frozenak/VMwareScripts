@@ -75,7 +75,7 @@ Function Get-SnapshotCreator {
         [datetime]$Created
     )
 
-    (Get-VIEvent -Entity $VM -Types Info -Start $Created.AddSeconds(-30) -Finish $Created.AddSeconds(30) | Where FullFormattedMessage -eq "Task: Create virtual machine snapshot" | Select -ExpandProperty UserName).Split("\")[-1]
+    (Get-VIEvent -Entity $VM -Types Info -Start $Created.AddSeconds(-30) -Finish $Created.AddSeconds(30) | Where-Object FullFormattedMessage -eq "Task: Create virtual machine snapshot" | Select-Object -ExpandProperty UserName).Split("\")[-1]
 }
 
 Function Script_Logging{
@@ -127,7 +127,7 @@ Connect-VIServer $vcenter
 If($global:defaultviserver){
 Script_Logging "`tSuccessfully connected to $global:DefaultVIServer.Name"
 Script_Logging "`tLooking for snapshots on $global:DefaultVIServer.Name"
-$Snaps = Get-VM -Server $global:DefaultVIServer.Name | Get-Snapshot | Select @{N="vCenter";E={$global:DefaultVIServer.Name}},VM,PowerState,Name,Description,@{Name="SizeGB";Expression={ [math]::Round($_.SizeGB,2) }},@{Name="Creator";Expression={ Get-SnapshotCreator -VM $_.VM -Created $_.Created }},Created
+$Snaps = Get-VM -Server $global:DefaultVIServer.Name | Get-Snapshot | Select-Object @{N="vCenter";E={$global:DefaultVIServer.Name}},VM,PowerState,Name,Description,@{Name="SizeGB";Expression={ [math]::Round($_.SizeGB,2) }},@{Name="Creator";Expression={ Get-SnapshotCreator -VM $_.VM -Created $_.Created }},Created
 
     If (!($Snaps)){
     $SnapReport += [PSCustomObject]@{vCenter="#boldgreen No snapshots found on $global:DefaultVIServer boldgreen#"
