@@ -24,8 +24,12 @@ $Logging_ScriptRootPath = Split-Path $script:MyInvocation.MyCommand.Path
 $Logging_ExecutionTime = Get-Date -Format yyyy-MM-dd-HHmmss
 $Logging_ExecutionDirectory = $Logging_ScriptRootPath + "\Logging\"
 $Logging_ExecutionLogFile = $Logging_ExecutionDirectory + $Logging_ExecutionTime + "_vSphere_Report.log"
+
+#Path to individual HTML files to generate if a copy is wanted
 $SnapReportFile = $Logging_ExecutionDirectory + $Logging_ExecutionTime + "_SnapReport.html"
 $ConsReportFile = $Logging_ExecutionDirectory + $Logging_ExecutionTime + "_ConsReport.html"
+
+#Path to consolidated HTML report
 $vSphereReportFile = $Logging_ExecutionDirectory + $Logging_ExecutionTime + "_vSphere_Report.html"
 
 #Create logging folder path if needed
@@ -184,8 +188,6 @@ Script_Logging "`tFailed to connect to $vcenter"
     }
 }
 
-#$PathToReport = "C:\Files\Scripts\WorkInProgress\"
-
 $SnapReport = $SnapReport | ConvertTo-Html -Head $Header -PreContent "<p><h2><font color=blue>vCenter Snapshots Report</font></h2></p>" | Set-AlternatingRows -CSSEvenClass even -CSSOddClass odd
 $SnapReport = $SnapReport -replace "#boldgreen","<font color=green><b>"
 $SnapReport = $SnapReport -replace "boldgreen#","</b></font>"
@@ -196,6 +198,8 @@ $SnapReport = $SnapReport -replace "<td>vcenter2.fqdn</td>","<td><font color=dar
 $SnapReport = $SnapReport -replace "<td>vcenter3.fqdn</td>","<td><font color=teal>vcenter3.fqdn</font></td>"
 $SnapReport = $SnapReport -replace "<td>vcenter4.fqdn</td>","<td><font color=darkslategray>vcenter4.fqdn</font></td>"
 $SnapReport = $SnapReport -replace "<td>vcenter5.fqdn</td>","<td><font color=slategray>vcenter5.fqdn</font></td>"
+
+#Uncomment to generate HTML output of snapshot report
 #$SnapReport | Out-File $SnapReportFile
 
 $ConsReport = $ConsReport | ConvertTo-Html -Head $Header -PreContent "<p><h2><font color=blue>vCenter Disk Consolidation Report</font></h2></p>" | Set-AlternatingRows -CSSEvenClass even -CSSOddClass odd
@@ -209,6 +213,8 @@ $ConsReport = $ConsReport -replace "<td>vcenter2.fqdn</td>","<td><font color=dar
 $ConsReport = $ConsReport -replace "<td>vcenter3.fqdn</td>","<td><font color=teal>vcenter3.fqdn</font></td>"
 $ConsReport = $ConsReport -replace "<td>vcenter4.fqdn</td>","<td><font color=darkslategray>vcenter4.fqdn</font></td>"
 $ConsReport = $ConsReport -replace "<td>vcenter5.fqdn</td>","<td><font color=slategray>vcenter5.fqdn</font></td>"
+
+#Uncomment to generate HTML output of consolidation report
 #$ConsReport | Out-File $ConsReportFile
 
 $footer = "Process run from $env:computername with account $env:username."
@@ -223,7 +229,7 @@ $SMTPServer = 'smtp.server'
 $MailSplat = @{
     To         = $To
     From       = $From
-    Subject    = VMware vSphere Report ($date)"
+    Subject    = VMware vSphere Report ($date)
     Body       = ($Report | Out-String)
     BodyAsHTML = $true
     SMTPServer = $SMTPServer
